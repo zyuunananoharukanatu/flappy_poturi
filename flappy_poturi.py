@@ -112,12 +112,12 @@ class App:
         offset = (pyxel.frame_count // 16) % 160
         for i in range(2):
             for x, y in self.far_cloud:
-                pyxel.blt(x + i * 160 - offset, y, 0, 63, 31, 32, 24, 12)
+                pyxel.blt(x + i * 160 - offset, y, 0, 63, 31, 32, 12, 12)
 
         offset = (pyxel.frame_count // 8) % 160
         for i in range(2):
             for x, y in self.near_cloud:
-                pyxel.blt(x + i * 160 - offset, y, 0, 0, 31, 56, 24, 12)
+                pyxel.blt(x + i * 160 - offset, y, 0, 0, 31, 56, 12, 12)
 
         # draw floors
         for x, y, is_active in self.floor:
