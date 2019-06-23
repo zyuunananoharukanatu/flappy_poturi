@@ -17,6 +17,10 @@ class App:
         self.player_vy = 0
         self.player_is_alive = True
 
+        # ジャンプ関連
+        self.jump_gauge = 20
+        self.jump_start_time = 0
+
         # オブジェクト関連
         self.upper_star = [(-10, 75), (40, 65), (90, 60)]
         self.downer_star = [(10, 25), (70, 35), (120, 15)]
@@ -33,6 +37,8 @@ class App:
 
         self.update_player()
 
+        pyxel.rect(100,100,130,130,12)
+
         for i, v in enumerate(self.floor):
             self.floor[i] = self.update_floor(*v)
 
@@ -41,17 +47,28 @@ class App:
 
     def update_player(self):
         # spaceでjump
-        if self.player_is_alive and pyxel.btn(pyxel.KEY_SPACE) : 
+        if self.jump_gauge > 0 and self.player_is_alive and pyxel.btn(pyxel.KEY_SPACE) : 
             self.player_vy = min(self.player_vy, -4)
+            if self.jump_start_time == 0:
+                self.jump_start_time = pyxel.frame_count
+                self.jump_gauge -= 1
+
+            elif (pyxel.frame_count - self.jump_start_time) > 10:
+                self.jump_gauge -= 1
+                self.jump_start_time = pyxel.frame_count
+
+        else :
+            self.jump_start_time = 0
 
         self.player_y += self.player_vy
         self.player_vy = min(self.player_vy + 1, 5)
-        self.score = (pyxel.frame_count - self.game_over_frame) / 10
+        self.score = (pyxel.frame_count - self.game_over_frame) // 10
 
         if self.player_y > pyxel.height:
             if self.player_y > 600:
                 self.score = 0
                 self.game_over_frame = pyxel.frame_count
+                self.jump_gauge = 20
                 self.player_x = 36
                 self.player_y = -16
                 self.player_vy = 0
@@ -60,9 +77,9 @@ class App:
     def update_floor(self, x, y, is_active):
         if is_active:
             if (
-                self.player_x + 16 >= x
-                and self.player_x <= x + 40
-                and self.player_y + 16 >= y
+                self.player_x + 14 >= x
+                and self.player_x <= x + 8
+                and self.player_y + 14 >= y
                 and self.player_y <= y + 8
                 and self.player_vy > 0
             ):
@@ -87,6 +104,9 @@ class App:
         if is_active and abs(x - self.player_x) < 12 and abs(y - self.player_y) < 12:
             is_active = False
             pyxel.play(3, 4)
+            self.jump_gauge += kind + 1
+            if self.jump_gauge > 20:
+                self.jump_gauge = 20
 
         x -= 2
 
@@ -123,9 +143,9 @@ class App:
             for x, y in self.downer_star:
                 pyxel.blt(x + i * 160 - offset, y, 0, 0, 31, 56, 12, 12)
 
-        # draw floors
+        # draw obstacle
         for x, y, is_active in self.floor:
-            pyxel.blt(x, y, 0, 0, 16, 40, 8, 12)
+            pyxel.blt(x, y, 0, 0, 16, 8, 8, 12)
 
         # draw fruits
         for x, y, kind, is_active in self.fruit:
@@ -148,6 +168,12 @@ class App:
         s = "SCORE {:>4}".format(self.score)
         pyxel.text(5, 4, s, 1)
         pyxel.text(4, 4, s, 7)
+
+        for i in range(0, self.jump_gauge):
+            pyxel.rect(4 + i * 3, 16, 3 + (i + 1) * 3, 20, 12)
+        
+        for i in range(self.jump_gauge, 20):
+            pyxel.rectb(4 + i * 3, 16, 3 + (i + 1) * 3, 20, 12)
 
 
 App()
