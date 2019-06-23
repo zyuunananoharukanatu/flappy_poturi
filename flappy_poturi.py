@@ -9,14 +9,17 @@ class App:
 
         pyxel.load("assets/jump_game.pyxel")
 
+        # プレイヤー関連
         self.score = 0
+        self.game_over_frame = 0
         self.player_x = 36
         self.player_y = -16
         self.player_vy = 0
         self.player_is_alive = True
 
-        self.far_cloud = [(-10, 75), (40, 65), (90, 60)]
-        self.near_cloud = [(10, 25), (70, 35), (120, 15)]
+        # オブジェクト関連
+        self.upper_star = [(-10, 75), (40, 65), (90, 60)]
+        self.downer_star = [(10, 25), (70, 35), (120, 15)]
         self.floor = [(i * 60, randint(8, 104), True) for i in range(4)]
         self.fruit = [(i * 60, randint(0, 104), randint(0, 2), True) for i in range(4)]
 
@@ -43,10 +46,12 @@ class App:
 
         self.player_y += self.player_vy
         self.player_vy = min(self.player_vy + 1, 5)
+        self.score = (pyxel.frame_count - self.game_over_frame) / 10
 
         if self.player_y > pyxel.height:
             if self.player_y > 600:
                 self.score = 0
+                self.game_over_frame = pyxel.frame_count
                 self.player_x = 36
                 self.player_y = -16
                 self.player_vy = 0
@@ -81,7 +86,6 @@ class App:
     def update_fruit(self, x, y, kind, is_active):
         if is_active and abs(x - self.player_x) < 12 and abs(y - self.player_y) < 12:
             is_active = False
-            self.score += (kind + 1) * 100
             pyxel.play(3, 4)
 
         x -= 2
@@ -111,12 +115,12 @@ class App:
         # draw star
         offset = (pyxel.frame_count // 16) % 160
         for i in range(2):
-            for x, y in self.far_cloud:
+            for x, y in self.upper_star:
                 pyxel.blt(x + i * 160 - offset, y, 0, 63, 31, 32, 12, 12)
 
         offset = (pyxel.frame_count // 8) % 160
         for i in range(2):
-            for x, y in self.near_cloud:
+            for x, y in self.downer_star:
                 pyxel.blt(x + i * 160 - offset, y, 0, 0, 31, 56, 12, 12)
 
         # draw floors
