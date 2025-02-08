@@ -5,9 +5,9 @@ import pyxel
 
 class App:
     def __init__(self):
-        pyxel.init(160, 120, caption="Pyxel Jump")
+        pyxel.init(160, 120, title="Pyxel Jump")
 
-        pyxel.load("assets/jump_game.pyxel")
+        pyxel.load("assets/jump_game.pyxres")
 
         # プレイヤー関連
         self.score = 0
@@ -174,6 +174,5 @@ class App:
         
         for i in range(self.jump_gauge, 20):
             pyxel.rectb(4, -3 * i + 68, 8, -3 * i + 71, 12)
-
 
 App()
