@@ -77,10 +77,10 @@ class App:
     def update_obstacle(self, x, y, is_active):
         if is_active:
             if (
-                self.player_x + 14 >= x
-                and self.player_x <= x + 8
-                and self.player_y + 14 >= y
-                and self.player_y <= y + 8
+                self.player_x + 15 >= x
+                and self.player_x <= x + 9
+                and self.player_y + 15 >= y
+                and self.player_y <= y + 9
                 and self.player_vy > 0
             ):
                 is_active = False
@@ -100,23 +100,21 @@ class App:
 
         return (x, y, is_active)
 
-    def update_water(self, x, y, kind, is_active):
+    def update_water(self, x, y, size, is_active):
         if is_active and abs(x - self.player_x) < 12 and abs(y - self.player_y) < 12:
             is_active = False
             pyxel.play(3, 4)
-            self.jump_gauge += kind + 1
-            if self.jump_gauge > 20:
-                self.jump_gauge = 20
+            self.jump_gauge = min(self.jump_gauge + size + 1, 20)
 
         x -= 2
 
         if x < -40:
             x += 240
             y = randint(0, 104)
-            kind = randint(0, 2)
+            size = randint(0, 2)
             is_active = True
 
-        return (x, y, kind, is_active)
+        return (x, y, size, is_active)
 
     def draw(self):
         pyxel.cls(0)
@@ -148,9 +146,9 @@ class App:
             pyxel.blt(x, y, 0, 0, 16, 8, 8, 12)
 
         # draw water
-        for x, y, kind, is_active in self.water:
+        for x, y, size, is_active in self.water:
             if is_active:
-                pyxel.blt(x, y, 0, 32 + kind * 16, 0, 16, 16, 11)
+                pyxel.blt(x, y, 0, 32 + size * 16, 0, 16, 16, 11)
 
         # draw player
         pyxel.blt(
@@ -170,9 +168,10 @@ class App:
         pyxel.text(4, 4, s, 7)
 
         for i in range(0, self.jump_gauge):
-            pyxel.rect(4, -3 * i + 68, 8, -3 * i + 71, 12)
+            pyxel.rect(4, 80 - (4 * i), 5, 4, 12)
         
         for i in range(self.jump_gauge, 20):
-            pyxel.rectb(4, -3 * i + 68, 8, -3 * i + 71, 12)
+            pyxel.rectb(4, 80 - (4 * i), 5, 4, 12)
+
 
 App()
